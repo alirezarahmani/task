@@ -6,7 +6,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Class User
+ * @package App
+ */
 class User extends Authenticatable
+//    implements MustVerifyEmail
 {
     use Notifiable;
 
@@ -36,4 +41,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function wallets()
+    {
+        return $this->hasMany(Wallet::class);
+    }
 }
