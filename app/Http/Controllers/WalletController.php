@@ -52,7 +52,7 @@ class WalletController extends Controller
         try {
             $email = Auth::guard('web')->user()->email;
             $this->service->add($walletRequest->get('name'), $email, intval($walletRequest->get('type')));
-            return redirect('home')->with( 'Thanks for registering!');
+            return redirect('home')->with( 'added with success');
         } catch (\InvalidArgumentException | ModelNotFoundException $e) {
             return redirect('home')->withErrors(['a wallet with same name already exist']);
         }
@@ -88,7 +88,7 @@ class WalletController extends Controller
         try {
             $email = Auth::user()->email;
             $amount = $request->get('credit');
-            $this->service->addRecord($id, $email, $amount, new Currency());
+            $this->service->addRecord($id, $email, intval($amount), new Currency());
             return redirect('home');
        } catch (\InvalidArgumentException $e) {
         return redirect('home')->withErrors([$e->getMessage()]);
@@ -105,8 +105,8 @@ class WalletController extends Controller
         try {
             $email = Auth::user()->email;
             $amount = $request->get('credit');
-            $this->service->subtractRecord($id, $email, $amount);
-            return redirect('home')->withErrors(['Thanks for registering!']);
+            $this->service->subtractRecord(intval($id), $email, intval($amount));
+            return redirect('home');
         } catch (\InvalidArgumentException $e) {
             return redirect('home')->withErrors(['you can not subtract more than your balance']);
         }

@@ -39,9 +39,12 @@ class WalletService
      */
     public function add(string $name, string $userEmail, int $type)
     {
-        $this->repository->findUserWallet($name, $userEmail);
-        $wallet = new Wallet($name, new WalletTypes($type), new Credit(0, new Currency()));
-        $this->repository->create($wallet, $userEmail);
+        try {
+            $this->repository->findUserWallet($name, $userEmail);
+        } catch (ModelNotFoundException $e) {
+            $wallet = new Wallet($name, new WalletTypes($type), new Credit(0, new Currency()));
+            $this->repository->create($wallet, $userEmail);
+        }
     }
 
     /**

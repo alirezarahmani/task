@@ -28,8 +28,9 @@ class WalletRepository implements WalletRepositoryInterface
         $walletModel = new WalletModel();
         $walletModel->name = $wallet->name();
         $walletModel->balance = 0;
-        $walletModel->type = $wallet->type();
+        $walletModel->type = $wallet->type()->key();
         $walletModel->user_id = $user->id;
+        $walletModel->currency = $wallet->currency();
         $walletModel->save();
     }
 
@@ -38,7 +39,8 @@ class WalletRepository implements WalletRepositoryInterface
         $walletModel = WalletModel::where('id', $id)->first();
         $walletModel->name = $wallet->name();
         $walletModel->balance = $wallet->balance();
-        $walletModel->type = $wallet->type();
+        $walletModel->type = $wallet->type()->key();
+        $walletModel->currency = $wallet->currency();
         $walletModel->save();
     }
 
@@ -53,7 +55,7 @@ class WalletRepository implements WalletRepositoryInterface
         $wallet = \App\Wallet::where('name', $name)->where('user_id', $user->id)->first();
 
         if ($wallet) {
-            return new Wallet($wallet->name, new WalletTypes($wallet->type), new Credit(0, new Currency(Currency::DOLLAR)));
+            return new Wallet($wallet->name, new WalletTypes($wallet->type), new Credit(0, new Currency($wallet->currency)));
         }
         throw new ModelNotFoundException('the wallet with ' . $name . ' is not found for user!');
     }
@@ -68,7 +70,7 @@ class WalletRepository implements WalletRepositoryInterface
         $user = User::where('email', $email)->first();
         $wallet = \App\Wallet::where('id', $id)->where('user_id', $user->id)->first();
         if ($wallet) {
-            return new Wallet($wallet->name, new WalletTypes($wallet->type), new Credit($wallet->balance, new Currency()));
+            return new Wallet($wallet->name, new WalletTypes($wallet->type), new Credit($wallet->balance, new Currency($wallet->currency)));
         }
         throw new ModelNotFoundException('the wallet with ' . $id . ' is not found for user!');
     }
@@ -96,7 +98,7 @@ class WalletRepository implements WalletRepositoryInterface
     }
 
 
-    public function overAll(User $user):int
+    public function overAll(User $user)
     {
         $result = DB::select(DB::raw('select sum(balance) as result from wallets where  user_id = :id'), ['id' => $user->id]);
         return $result[0]->result;

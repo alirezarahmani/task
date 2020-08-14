@@ -14,7 +14,7 @@ class Wallet
     /**
      * @var Credit
      */
-    private Credit $balance;
+    private Credit $credit;
     /**
      * @var WalletTypes
      */
@@ -25,16 +25,22 @@ class Wallet
     private string $name;
 
     /**
+     * @var Currency
+     */
+    private Currency $currency;
+
+    /**
      * Wallet constructor.
      * @param string $name
      * @param WalletTypes $type
-     * @param Credit $balance
+     * @param Credit $credit
      */
-    public function __construct(string $name, WalletTypes $type, Credit $balance)
+    public function __construct(string $name, WalletTypes $type, Credit $credit)
     {
         $this->name = $name;
         $this->type = $type;
-        $this->balance = $balance;
+        $this->credit = $credit;
+        $this->currency = $credit->currency();
     }
 
     /**
@@ -45,8 +51,8 @@ class Wallet
     public function addBalance(int $amount, Currency $currency)
     {
         Assertion::notEq($this->type->key(), WalletTypes::GIFT, 'u can not add balance to ur gift card');
-        $balance = new Credit($amount, $currency);
-        $this->balance = $this->balance->add($balance);
+        $credit = new Credit($amount, $currency);
+        $this->credit = $this->credit->add($credit);
     }
 
     /**
@@ -54,8 +60,8 @@ class Wallet
      */
     public function subtractBalance(int $amount)
     {
-        $balance = new Credit($amount, $this->balance->currency());
-        $this->balance = $this->balance->subtract($balance);
+        $credit = new Credit($amount, $this->credit->currency());
+        $this->credit = $this->credit->subtract($credit);
     }
 
     /**
@@ -63,7 +69,7 @@ class Wallet
      */
     public function balance()
     {
-        return $this->balance->amount();
+        return $this->credit->amount();
     }
 
     /**
@@ -74,8 +80,19 @@ class Wallet
         return $this->type;
     }
 
+    /**
+     * @return string
+     */
     public function name()
     {
         return $this->name;
+    }
+
+    /**
+     * @return int
+     */
+    public function currency()
+    {
+        return $this->currency->key();
     }
 }
